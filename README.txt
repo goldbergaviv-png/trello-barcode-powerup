@@ -1,26 +1,21 @@
-Upload these files to your GitHub repo root and overwrite existing ones:
+Upload all files in this ZIP to your GitHub repo root and overwrite existing ones:
 
 - index.html
 - client.js
 - popup.html
-- export.html
 - scanner.html
-- icon.png
+- scanner.js
+- scanner-config.js
 - logo.jpeg
-
-Important:
-1. In Trello Power-Up admin, enable capability: board-buttons
-2. Commit to GitHub and wait 30-60 seconds
-3. Hard refresh Trello and re-enable the Power-Up if needed
+- icon.png
+- README.txt
 
 Phone scanner link:
-https://YOUR_USERNAME.github.io/trello-barcode-powerup/scanner.html?v=9
+https://YOUR_USERNAME.github.io/trello-barcode-powerup/scanner.html
 
-Use:
-1. On each board, click Scanner Tools
-2. Download the board mapping JSON
-3. On your phone, open scanner.html?v=9
-4. Enter Trello API key + token once
-5. Load one or more mapping JSON files
-6. Start camera
-7. Scan card barcode, then list barcode
+Notes:
+- This version uses QR only, no mapping file.
+- Card QR content: CARD:<trelloCardId>
+- List QR content: LIST:<trelloListId>
+- I did not insert your real Trello API key/token into scanner-config.js.
+- Put them once into scanner-config.js before uploading.

@@ -1,28 +1,50 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Trello Scanner</title>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<style>body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#0f172a;color:#e5e7eb}.wrap{max-width:760px;margin:0 auto;padding:16px}.card{background:#111827;border-radius:16px;padding:16px;margin-bottom:14px}h1{font-size:24px;margin:0 0 12px}h2{font-size:18px;margin:0 0 10px}label{display:block;font-size:13px;margin-bottom:6px;color:#cbd5e1}input[type=text],input[type=password]{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#0b1220;color:#fff}input[type=file]{width:100%;padding:10px;border-radius:10px;border:1px dashed #334155;background:#0b1220;color:#fff}button{border:0;border-radius:10px;padding:12px 14px;background:#2563eb;color:#fff;font-size:14px;cursor:pointer}button.secondary{background:#334155}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.status{font-size:16px;font-weight:700;margin-bottom:8px}.meta{font-size:13px;color:#cbd5e1}.value{font-size:20px;font-weight:700;word-break:break-word}.ok{color:#4ade80}.warn{color:#fbbf24}.err{color:#f87171}#reader{width:100%;overflow:hidden;border-radius:12px}.small{font-size:12px;color:#94a3b8}@media (max-width:600px){.row{grid-template-columns:1fr}}</style>
-</head><body><div class="wrap">
-<div class="card"><h1>Trello Scanner</h1><div class="small">Scan a card barcode, then a list barcode.</div></div>
-<div class="card"><h2>1. Credentials</h2><div class="row"><div><label for="apiKey">Trello API Key</label><input id="apiKey" type="text" placeholder="Paste API key"></div><div><label for="token">Trello Token</label><input id="token" type="password" placeholder="Paste Trello token"></div></div><div style="margin-top:12px"><button id="saveCreds">Save on this phone</button></div></div>
-<div class="card"><h2>2. Load mapping file(s)</h2><label for="mappingFile">Upload one or more board mapping JSON files exported from Trello</label><input id="mappingFile" type="file" accept=".json,application/json" multiple><div id="mappingSummary" class="small" style="margin-top:10px">No mapping loaded yet.</div></div>
-<div class="card"><h2>3. Scan</h2><div class="status" id="statusText">Load mapping, then start camera.</div><div class="row" style="margin-bottom:12px"><div><div class="meta">Card</div><div class="value" id="cardCode">—</div></div><div><div class="meta">List</div><div class="value" id="listCode">—</div></div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><button id="startBtn">Start camera</button><button class="secondary" id="stopBtn">Stop camera</button><button class="secondary" id="resetBtn">Reset scanned values</button></div><div id="reader"></div><div id="result" class="small" style="margin-top:12px"></div></div>
-</div>
-<script>
-const state={mappings:{cards:{},lists:{},boards:{}},currentCardCode:'',currentListCode:'',scanner:null,lastText:'',lastAt:0};const el=id=>document.getElementById(id);
-function loadCreds(){el('apiKey').value=localStorage.getItem('trello_api_key')||'';el('token').value=localStorage.getItem('trello_token')||''}
-function saveCreds(){localStorage.setItem('trello_api_key',el('apiKey').value.trim());localStorage.setItem('trello_token',el('token').value.trim());setResult('Credentials saved on this phone.','ok')}
-function setStatus(text,cls=''){const x=el('statusText');x.textContent=text;x.className='status '+cls}
-function setResult(text,cls=''){const x=el('result');x.textContent=text;x.className='small '+cls}
-function refreshScannedUI(){el('cardCode').textContent=state.currentCardCode||'—';el('listCode').textContent=state.currentListCode||'—'}
-function mergeMappingFile(obj){if(obj.board&&obj.board.code){state.mappings.boards[obj.board.code]=obj.board}if(obj.cards){Object.assign(state.mappings.cards,obj.cards)}if(obj.lists){Object.assign(state.mappings.lists,obj.lists)}}
-function updateSummary(){const c=Object.keys(state.mappings.cards).length,l=Object.keys(state.mappings.lists).length,b=Object.keys(state.mappings.boards).length;el('mappingSummary').textContent=`Loaded ${b} board(s), ${l} list code(s), ${c} card code(s).`}
-async function handleMappingFiles(files){for(const file of files){const text=await file.text();const data=JSON.parse(text);mergeMappingFile(data)}updateSummary();setResult('Mapping file(s) loaded.','ok')}
-async function moveCard(cardCode,listCode){const card=state.mappings.cards[cardCode],list=state.mappings.lists[listCode];if(!card) throw new Error('Card code not found in loaded mapping: '+cardCode);if(!list) throw new Error('List code not found in loaded mapping: '+listCode);const key=el('apiKey').value.trim(),token=el('token').value.trim();if(!key||!token) throw new Error('Missing Trello API key or token.');const url=new URL(`https://api.trello.com/1/cards/${card.id}`);url.searchParams.set('idList',list.id);url.searchParams.set('key',key);url.searchParams.set('token',token);const res=await fetch(url.toString(),{method:'PUT'});if(!res.ok){const txt=await res.text();throw new Error(`Trello move failed: ${res.status} ${txt}`)}return {card,list}}
-async function maybeMove(){if(!state.currentCardCode||!state.currentListCode)return;try{setStatus('Moving card…','warn');const moved=await moveCard(state.currentCardCode,state.currentListCode);setStatus('Move completed','ok');setResult(`Moved ${moved.card.name} → ${moved.list.name}`,'ok');if(navigator.vibrate)navigator.vibrate(120);state.currentCardCode='';state.currentListCode='';refreshScannedUI()}catch(err){setStatus('Move failed','err');setResult(err.message,'err')}}
-function processScan(text){const now=Date.now();if(text===state.lastText&&now-state.lastAt<1500)return;state.lastText=text;state.lastAt=now;const clean=String(text||'').trim().toUpperCase();if(!clean)return;if(clean.startsWith('C')){state.currentCardCode=clean;setStatus('Card scanned. Waiting for list…','warn');setResult(`Card scanned: ${clean}`,'')}else if(clean.startsWith('L')){state.currentListCode=clean;setStatus('List scanned. Ready to move…','warn');setResult(`List scanned: ${clean}`,'')}else{setResult('Unknown barcode format: '+clean,'err');return}refreshScannedUI();maybeMove()}
-async function startScanner(){if(state.scanner)return;state.scanner=new Html5Qrcode('reader');try{await state.scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:180},aspectRatio:1.3333333,formatsToSupport:[Html5QrcodeSupportedFormats.CODE_128]},processScan);setStatus('Camera running. Scan card first.','ok');setResult('Camera started.','ok')}catch(err){state.scanner=null;setStatus('Camera failed','err');setResult(err.message||String(err),'err')}}
-async function stopScanner(){if(!state.scanner)return;try{await state.scanner.stop();await state.scanner.clear()}catch(e){}state.scanner=null;setStatus('Camera stopped','')}
-function resetScans(){state.currentCardCode='';state.currentListCode='';refreshScannedUI();setStatus('Ready to scan card first.','');setResult('Scanned values cleared.','')}
-el('saveCreds').addEventListener('click',saveCreds);el('mappingFile').addEventListener('change',async(e)=>{if(e.target.files&&e.target.files.length){try{await handleMappingFiles(e.target.files)}catch(err){setResult(err.message,'err')}}});el('startBtn').addEventListener('click',startScanner);el('stopBtn').addEventListener('click',stopScanner);el('resetBtn').addEventListener('click',resetScans);loadCreds();refreshScannedUI();setStatus('Load mapping, then start camera.','');
-</script></body></html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Move Card</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="./scanner-config.js?v=11"></script>
+  <script src="./scanner.js?v=11" defer></script>
+  <style>
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0f172a;color:#e5e7eb;min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .wrap{width:min(92vw,460px);text-align:center}
+    .panel{background:#111827;border-radius:20px;padding:22px 18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .title{font-size:30px;font-weight:700;margin-bottom:10px}
+    .subtitle{color:#94a3b8;font-size:14px;min-height:20px;margin-bottom:16px}
+    .big-btn{width:100%;border:0;border-radius:16px;padding:18px 20px;font-size:28px;font-weight:700;background:#2563eb;color:white;cursor:pointer}
+    .state{font-size:28px;font-weight:700;margin:10px 0 6px}
+    .hint{font-size:15px;color:#cbd5e1;min-height:22px;margin-bottom:12px}
+    .value{font-size:20px;font-weight:700;color:#f8fafc;word-break:break-word;min-height:28px;margin-bottom:8px}
+    #reader{width:100%;overflow:hidden;border-radius:14px;margin-top:10px}
+    .hidden{display:none}.ok{color:#4ade80}.warn{color:#fbbf24}.err{color:#f87171}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div id="homeScreen">
+        <div class="title">Move Card</div>
+        <div class="subtitle" id="homeStatus">Ready</div>
+        <button class="big-btn" id="moveBtn">Move Card</button>
+      </div>
+      <div id="scanScreen" class="hidden">
+        <div class="state" id="stateText">Scan Card</div>
+        <div class="hint" id="hintText">Point the camera at a card QR</div>
+        <div class="value" id="scanValue"></div>
+        <div id="reader"></div>
+      </div>
+      <div id="doneScreen" class="hidden">
+        <div class="state ok">DONE</div>
+        <div class="hint" id="doneText"></div>
+      </div>
+      <div id="errorScreen" class="hidden">
+        <div class="state err">ERROR</div>
+        <div class="hint" id="errorText"></div>
+        <button class="big-btn" id="backBtn" style="font-size:22px;margin-top:10px;">Back</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
