@@ -1,10 +1,7 @@
 window.TrelloPowerUp.initialize({
   'card-buttons': function (t) {
     return [{
-      icon: {
-        dark: './icon.png',
-        light: './icon.png'
-      },
+      icon: './icon.png',
       text: 'Print Barcode',
       callback: function (t) {
         return t.popup({
