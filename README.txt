@@ -1,30 +1,20 @@
-Overwrite your GitHub repo root with these files:
+Overwrite these files in your GitHub repo root:
 
 - index.html
 - client.js
 - popup.html
 - logo.jpeg
+- icon.png
 
-About the logo:
-- This ZIP already includes your logo file as logo.jpeg
-- Keep it in the root of the GitHub repo
-- popup.html reads it locally with: ./logo.jpeg
-- No external hosting is needed beyond GitHub Pages
+Fixes in v7:
+- Print button added back
+- Close button added
+- Logo constrained to fit 60mm label width
+- Second description line fixed
+- Cache-busting added (?v=7)
 
-Power-Up connector URL:
-https://YOUR_USERNAME.github.io/trello-barcode-powerup/index.html
-
-This version includes:
-- Short codes:
-  - Boards: B01, B02...
-  - Lists: LBBLL
-  - Cards: CBB00001
-- Print Barcode inside card
-- Print List Barcode
-- Print ALL Card Barcodes in a list
-- Card label layout: 60mm x 90mm portrait
-  - logo at top
-  - card name on left / due date on right
-  - cover image
-  - Comments: first 2 lines of description
-  - barcode at bottom
+After upload:
+1. Commit changes
+2. Wait 30-60 seconds
+3. Hard refresh Trello
+4. If needed, disable and re-enable the Power-Up

@@ -7,8 +7,8 @@ window.TrelloPowerUp.initialize({
       callback: function (t) {
         return t.popup({
           title: 'Print Card Barcode',
-          url: './popup.html?v=6&mode=card',
-          height: 650
+          url: './popup.html?v=7&mode=card',
+          height: 700
         });
       }
     }];
@@ -21,8 +21,8 @@ window.TrelloPowerUp.initialize({
         callback: function (t) {
           return t.popup({
             title: 'Print List Barcode',
-            url: './popup.html?v=6&mode=list',
-            height: 650
+            url: './popup.html?v=7&mode=list',
+            height: 700
           });
         }
       },
@@ -31,8 +31,8 @@ window.TrelloPowerUp.initialize({
         callback: function (t) {
           return t.popup({
             title: 'Print All Card Barcodes',
-            url: './popup.html?v=6&mode=allcards',
-            height: 650
+            url: './popup.html?v=7&mode=allcards',
+            height: 700
           });
         }
       }
