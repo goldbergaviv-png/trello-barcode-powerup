@@ -1,4 +1,5 @@
 window.TrelloPowerUp.initialize({
+
   'card-buttons': function (t) {
     return [{
       icon: './icon.png',
@@ -6,7 +7,7 @@ window.TrelloPowerUp.initialize({
       callback: function (t) {
         return t.popup({
           title: 'Print Card Barcode',
-          url: './popup.html?mode=card',
+          url: './popup.html?v=6&mode=card',
           height: 650
         });
       }
@@ -20,7 +21,7 @@ window.TrelloPowerUp.initialize({
         callback: function (t) {
           return t.popup({
             title: 'Print List Barcode',
-            url: './popup.html?mode=list',
+            url: './popup.html?v=6&mode=list',
             height: 650
           });
         }
@@ -30,11 +31,12 @@ window.TrelloPowerUp.initialize({
         callback: function (t) {
           return t.popup({
             title: 'Print All Card Barcodes',
-            url: './popup.html?mode=allcards',
+            url: './popup.html?v=6&mode=allcards',
             height: 650
           });
         }
       }
     ];
   }
+
 });

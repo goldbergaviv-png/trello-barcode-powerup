@@ -1,465 +1,272 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Trello Barcode Label</title>
-  <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-  <style>
-    :root{
-      --label-w: 60mm;
-      --label-h: 90mm;
-      --inner-w: 54mm;
-    }
+<meta charset="utf-8">
+<title>Trello Barcode Label</title>
+<script src="https://p.trellocdn.com/power-up.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 
-    @page {
-      size: 60mm 90mm;
-      margin: 0;
-    }
+<style>
 
-    * { box-sizing: border-box; }
+@page {
+  size: 60mm 90mm;
+  margin:0;
+}
 
-    body {
-      margin: 0;
-      padding: 8px;
-      background: #f6f7f9;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #111;
-    }
+body{
+  margin:0;
+  font-family:Arial;
+}
 
-    #controls {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      background: #f6f7f9;
-      padding: 8px 0 12px;
-      text-align: center;
-    }
+.label{
+  width:60mm;
+  height:90mm;
+  padding:3mm;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
 
-    button {
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 16px;
-      background: #0c66e4;
-      color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-      margin: 0 6px;
-    }
+.logo{
+  height:12mm;
+  margin-bottom:2mm;
+}
 
-    .secondary {
-      background: #dfe1e6;
-      color: #172b4d;
-    }
+.row{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
+  font-size:11pt;
+}
 
-    #sheet {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding-bottom: 16px;
-    }
+.cover{
+  width:100%;
+  height:32mm;
+  object-fit:contain;
+  margin-top:2mm;
+  margin-bottom:2mm;
+}
 
-    .label {
-      width: var(--label-w);
-      height: var(--label-h);
-      background: white;
-      color: #000;
-      overflow: hidden;
-      border: 1px solid #ddd;
-      position: relative;
-      page-break-after: always;
-      break-after: page;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 3mm 3mm 2mm 3mm;
-    }
+.commentsTitle{
+  font-size:9pt;
+  font-weight:bold;
+  width:100%;
+}
 
-    .logo-wrap {
-      width: var(--inner-w);
-      height: 12mm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1mm;
-      flex: 0 0 auto;
-    }
+.comment{
+  font-size:8pt;
+  width:100%;
+}
 
-    .logo-wrap img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: block;
-    }
+.barcode{
+  margin-top:auto;
+  text-align:center;
+}
 
-    .title-row {
-      width: var(--inner-w);
-      min-height: 9mm;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 2mm;
-      margin-bottom: 1.5mm;
-      flex: 0 0 auto;
-    }
+.barcode svg{
+  width:50mm;
+  height:14mm;
+}
 
-    .card-name, .list-name {
-      font-size: 10.5pt;
-      font-weight: 700;
-      line-height: 1.1;
-      text-align: left;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      max-height: 8mm;
-      flex: 1 1 auto;
-    }
+.code{
+  font-weight:bold;
+  font-size:11pt;
+}
 
-    .due-date {
-      font-size: 9pt;
-      font-weight: 700;
-      white-space: nowrap;
-      text-align: right;
-      flex: 0 0 auto;
-      min-width: 13mm;
-    }
-
-    .cover-wrap {
-      width: var(--inner-w);
-      height: 32mm;
-      border: 1px solid #ddd;
-      border-radius: 1.5mm;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-      margin-bottom: 1.5mm;
-      flex: 0 0 auto;
-    }
-
-    .cover-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    .no-cover {
-      font-size: 9pt;
-      color: #666;
-    }
-
-    .comments-wrap {
-      width: var(--inner-w);
-      min-height: 15mm;
-      margin-bottom: 1.5mm;
-      flex: 0 0 auto;
-    }
-
-    .comments-title {
-      font-size: 8.5pt;
-      font-weight: 700;
-      margin-bottom: 0.5mm;
-      text-align: left;
-    }
-
-    .comment-line {
-      font-size: 8pt;
-      line-height: 1.15;
-      text-align: left;
-      min-height: 3.6mm;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .barcode-wrap {
-      width: var(--inner-w);
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      flex: 0 0 auto;
-    }
-
-    .barcode-wrap svg {
-      width: 50mm;
-      height: 14mm;
-      display: block;
-    }
-
-    .barcode-code {
-      margin-top: 1mm;
-      font-size: 10pt;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-    }
-
-    .list-layout .title-row {
-      justify-content: center;
-      align-items: center;
-      min-height: 12mm;
-      margin-top: 2mm;
-      margin-bottom: 3mm;
-    }
-
-    .list-layout .list-name {
-      text-align: center;
-      font-size: 14pt;
-      max-height: none;
-      -webkit-line-clamp: unset;
-    }
-
-    .list-layout .spacer {
-      flex: 1 1 auto;
-      min-height: 20mm;
-    }
-
-    @media print {
-      body {
-        background: white;
-        padding: 0;
-      }
-      #controls {
-        display: none;
-      }
-      #sheet {
-        gap: 0;
-        padding-bottom: 0;
-      }
-      .label {
-        border: 0;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <div id="controls">
-    <button onclick="window.print()">Print</button>
-    <button class="secondary" onclick="window.close()">Close</button>
-  </div>
-  <div id="sheet"></div>
 
-  <template id="cardTemplate">
-    <div class="label card-layout">
-      <div class="logo-wrap"><img src="./logo.jpeg" alt="Logo"></div>
-      <div class="title-row">
-        <div class="card-name"></div>
-        <div class="due-date"></div>
-      </div>
-      <div class="cover-wrap"><div class="no-cover">No cover image</div></div>
-      <div class="comments-wrap">
-        <div class="comments-title">Comments:</div>
-        <div class="comment-line line1"></div>
-        <div class="comment-line line2"></div>
-      </div>
-      <div class="barcode-wrap">
-        <svg></svg>
-        <div class="barcode-code"></div>
-      </div>
-    </div>
-  </template>
+<div id="container"></div>
 
-  <template id="listTemplate">
-    <div class="label list-layout">
-      <div class="logo-wrap"><img src="./logo.jpeg" alt="Logo"></div>
-      <div class="title-row">
-        <div class="list-name"></div>
-      </div>
-      <div class="spacer"></div>
-      <div class="barcode-wrap">
-        <svg></svg>
-        <div class="barcode-code"></div>
-      </div>
-    </div>
-  </template>
+<script>
 
-  <script>
-    const t = window.TrelloPowerUp.iframe();
+const t = window.TrelloPowerUp.iframe()
 
-    function qs(name) {
-      return new URLSearchParams(window.location.search).get(name);
-    }
+function qs(n){return new URLSearchParams(window.location.search).get(n)}
 
-    function formatDue(due) {
-      if (!due) return '';
-      const d = new Date(due);
-      if (isNaN(d.getTime())) return '';
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = d.toLocaleString('en', { month: 'short' });
-      return `${day} ${month}`;
-    }
+function formatDue(d){
+ if(!d) return ""
+ const x=new Date(d)
+ return x.getDate()+" "+x.toLocaleString('en',{month:'short'})
+}
 
-    function firstTwoDescLines(desc) {
-      const cleaned = (desc || '')
-        .replace(/\r/g, '')
-        .split('\n')
-        .map(s => s.trim())
-        .filter(Boolean);
+function renderBarcode(svg,text){
+ JsBarcode(svg,text,{format:"CODE128",width:1.5,height:40,displayValue:false})
+}
 
-      return [
-        cleaned[0] || '',
-        cleaned[1] || ''
-      ];
-    }
+async function getBoardData(){
 
-    function renderBarcode(svgEl, text) {
-      JsBarcode(svgEl, text, {
-        format: 'CODE128',
-        width: 1.55,
-        height: 42,
-        displayValue: false,
-        margin: 0
-      });
-    }
+ let data = await t.get('board','shared','barcodeMap') || {}
 
-    async function getBoardData() {
-      let data = await t.get('board', 'shared', 'barcodeMap') || {};
+ if(!data.boardCode){
 
-      if (!data.boardCode) {
-        let counter = await t.get('organization', 'shared', 'boardCounter') || 0;
-        counter++;
-        await t.set('organization', 'shared', 'boardCounter', counter);
+   let counter = await t.get('organization','shared','boardCounter') || 0
+   counter++
+   await t.set('organization','shared','boardCounter',counter)
 
-        data.boardCode = 'B' + String(counter).padStart(2, '0');
-        data.cardCounter = 0;
-        data.listCounter = 0;
-        data.cards = {};
-        data.lists = {};
+   data.boardCode="B"+String(counter).padStart(2,"0")
+   data.cardCounter=0
+   data.listCounter=0
+   data.cards={}
+   data.lists={}
 
-        await t.set('board', 'shared', 'barcodeMap', data);
-      }
+   await t.set('board','shared','barcodeMap',data)
+ }
 
-      data.cardCounter = data.cardCounter || 0;
-      data.listCounter = data.listCounter || 0;
-      data.cards = data.cards || {};
-      data.lists = data.lists || {};
+ return data
+}
 
-      return data;
-    }
+async function getCardCode(id){
 
-    async function getListCode(listId) {
-      const data = await getBoardData();
+ let data = await getBoardData()
 
-      if (!data.lists[listId]) {
-        data.listCounter++;
-        const bb = data.boardCode.substring(1);
-        const ll = String(data.listCounter).padStart(2, '0');
-        data.lists[listId] = 'L' + bb + ll;
-        await t.set('board', 'shared', 'barcodeMap', data);
-      }
+ if(!data.cards[id]){
+   data.cardCounter++
+   const bb=data.boardCode.substring(1)
+   const num=String(data.cardCounter).padStart(5,"0")
+   data.cards[id]="C"+bb+num
+   await t.set('board','shared','barcodeMap',data)
+ }
 
-      return data.lists[listId];
-    }
+ return data.cards[id]
+}
 
-    async function getCardCode(cardId) {
-      const data = await getBoardData();
+async function getListCode(id){
 
-      if (!data.cards[cardId]) {
-        data.cardCounter++;
-        const bb = data.boardCode.substring(1);
-        const n = String(data.cardCounter).padStart(5, '0');
-        data.cards[cardId] = 'C' + bb + n;
-        await t.set('board', 'shared', 'barcodeMap', data);
-      }
+ let data = await getBoardData()
 
-      return data.cards[cardId];
-    }
+ if(!data.lists[id]){
+   data.listCounter++
+   const bb=data.boardCode.substring(1)
+   const num=String(data.listCounter).padStart(2,"0")
+   data.lists[id]="L"+bb+num
+   await t.set('board','shared','barcodeMap',data)
+ }
 
-    function pickCoverUrl(card) {
-      if (!card) return '';
+ return data.lists[id]
+}
 
-      if (card.cover && card.cover.scaled && card.cover.scaled.length) {
-        const sorted = card.cover.scaled.slice().sort((a, b) => (b.width || 0) - (a.width || 0));
-        const found = sorted.find(x => x.url);
-        if (found) return found.url;
-      }
+function firstLines(desc){
+ const lines=(desc||"").split("\n")
+ return [lines[0]||"",lines[1]||""]
+}
 
-      if (card.cover && card.cover.url) return card.cover.url;
+function createLabel(){
+ const d=document.createElement("div")
+ d.className="label"
+ return d
+}
 
-      if (Array.isArray(card.attachments)) {
-        const img = card.attachments.find(a => a.previews && a.previews.length);
-        if (img) {
-          const p = img.previews.slice().sort((a, b) => (b.width || 0) - (a.width || 0))[0];
-          if (p && p.url) return p.url;
-          if (img.url) return img.url;
-        }
-      }
+async function init(){
 
-      return '';
-    }
+ const mode=qs("mode")
+ const container=document.getElementById("container")
 
-    function addCardLabel(card, code) {
-      const tmpl = document.getElementById('cardTemplate');
-      const node = tmpl.content.firstElementChild.cloneNode(true);
+ if(mode==="card"){
 
-      node.querySelector('.card-name').textContent = card.name || '';
-      node.querySelector('.due-date').textContent = formatDue(card.due);
+   const card=await t.card("id","name","due","desc","cover")
+   const code=await getCardCode(card.id)
 
-      const [line1, line2] = firstTwoDescLines(card.desc);
-      node.querySelector('.line1').textContent = line1;
-      node.querySelector('.line2').textContent = line2;
+   const label=createLabel()
 
-      const coverUrl = pickCoverUrl(card);
-      const coverWrap = node.querySelector('.cover-wrap');
-      if (coverUrl) {
-        coverWrap.innerHTML = '';
-        const img = document.createElement('img');
-        img.src = coverUrl;
-        img.alt = 'Cover image';
-        coverWrap.appendChild(img);
-      }
+   const logo=document.createElement("img")
+   logo.src="./logo.jpeg"
+   logo.className="logo"
+   label.appendChild(logo)
 
-      const svg = node.querySelector('svg');
-      renderBarcode(svg, code);
-      node.querySelector('.barcode-code').textContent = code;
+   const row=document.createElement("div")
+   row.className="row"
+   row.innerHTML="<div>"+card.name+"</div><div>"+formatDue(card.due)+"</div>"
+   label.appendChild(row)
 
-      document.getElementById('sheet').appendChild(node);
-    }
+   if(card.cover && card.cover.url){
+     const img=document.createElement("img")
+     img.src=card.cover.url
+     img.className="cover"
+     label.appendChild(img)
+   }
 
-    function addListLabel(list, code) {
-      const tmpl = document.getElementById('listTemplate');
-      const node = tmpl.content.firstElementChild.cloneNode(true);
+   const title=document.createElement("div")
+   title.className="commentsTitle"
+   title.innerText="Comments:"
+   label.appendChild(title)
 
-      node.querySelector('.list-name').textContent = list.name || '';
-      const svg = node.querySelector('svg');
-      renderBarcode(svg, code);
-      node.querySelector('.barcode-code').textContent = code;
+   const [l1,l2]=firstLines(card.desc)
 
-      document.getElementById('sheet').appendChild(node);
-    }
+   const c1=document.createElement("div")
+   c1.className="comment"
+   c1.innerText=l1
+   label.appendChild(c1)
 
-    async function init() {
-      const mode = qs('mode');
+   const c2=document.createElement("div")
+   c2.className="comment"
+   c2.innerText=l2
+   label.appendChild(c2)
 
-      if (mode === 'card') {
-        const card = await t.card('id', 'name', 'due', 'desc', 'cover', 'attachments');
-        const code = await getCardCode(card.id);
-        addCardLabel(card, code);
-      }
+   const bc=document.createElement("div")
+   bc.className="barcode"
 
-      if (mode === 'list') {
-        const list = await t.list('id', 'name');
-        const code = await getListCode(list.id);
-        addListLabel(list, code);
-      }
+   const svg=document.createElementNS("http://www.w3.org/2000/svg","svg")
+   bc.appendChild(svg)
 
-      if (mode === 'allcards') {
-        const cards = await t.cards('id', 'name', 'due', 'desc', 'cover', 'attachments');
-        for (const card of cards) {
-          const code = await getCardCode(card.id);
-          addCardLabel(card, code);
-        }
-      }
+   const txt=document.createElement("div")
+   txt.className="code"
+   txt.innerText=code
+   bc.appendChild(txt)
 
-      try { t.sizeTo(document.body); } catch (e) {}
-    }
+   label.appendChild(bc)
 
-    init();
-  </script>
+   container.appendChild(label)
+
+   renderBarcode(svg,code)
+ }
+
+ if(mode==="list"){
+
+   const list=await t.list("id","name")
+   const code=await getListCode(list.id)
+
+   const label=createLabel()
+
+   const logo=document.createElement("img")
+   logo.src="./logo.jpeg"
+   logo.className="logo"
+   label.appendChild(logo)
+
+   const title=document.createElement("div")
+   title.style.fontSize="16pt"
+   title.style.fontWeight="bold"
+   title.style.marginTop="8mm"
+   title.innerText=list.name
+   label.appendChild(title)
+
+   const bc=document.createElement("div")
+   bc.className="barcode"
+
+   const svg=document.createElementNS("http://www.w3.org/2000/svg","svg")
+   bc.appendChild(svg)
+
+   const txt=document.createElement("div")
+   txt.className="code"
+   txt.innerText=code
+   bc.appendChild(txt)
+
+   label.appendChild(bc)
+
+   container.appendChild(label)
+
+   renderBarcode(svg,code)
+ }
+
+}
+
+init()
+
+</script>
+
 </body>
 </html>
