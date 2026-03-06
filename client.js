@@ -1,38 +1,31 @@
-const ICON = {
-  light: './icon.svg',
-  dark: './icon.svg'
-};
-
-function openCardPopup(t) {
-  return t.popup({
-    title: 'Print Card Barcode',
-    url: './print-card.html',
-    height: 360,
-  });
-}
-
-function openListPopup(t) {
-  return t.popup({
-    title: 'Print List Barcode',
-    url: './print-list.html',
-    height: 360,
-  });
-}
-
 window.TrelloPowerUp.initialize({
   'card-buttons': function (t) {
     return [{
-      icon: ICON,
+      icon: {
+        dark: './icon.png',
+        light: './icon.png'
+      },
       text: 'Print Barcode',
-      condition: 'edit',
-      callback: openCardPopup,
+      callback: function (t) {
+        return t.popup({
+          title: 'Print Card Barcode',
+          url: './index.html?mode=card',
+          height: 260
+        });
+      }
     }];
   },
 
   'list-actions': function (t) {
     return [{
-      text: 'Print List Barcode…',
-      callback: openListPopup,
+      text: 'Print List Barcode',
+      callback: function (t) {
+        return t.popup({
+          title: 'Print List Barcode',
+          url: './index.html?mode=list',
+          height: 260
+        });
+      }
     }];
-  },
+  }
 });
