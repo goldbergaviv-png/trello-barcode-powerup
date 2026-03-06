@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://p.trellocdn.com/power-up.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+body{font-family:Arial;text-align:center;margin:20px;}
+svg{margin-top:10px;}
+button{margin-top:15px;padding:8px 12px;}
+</style>
+</head>
+<body>
+
+<h3 id="title">Barcode</h3>
+<svg id="barcode"></svg>
+
+<div>
+<button onclick="window.print()">Print</button>
+</div>
+
+<script>
+const t = window.TrelloPowerUp.iframe();
+
+function qs(name){
+  return new URLSearchParams(window.location.search).get(name);
+}
+
+async function init(){
+
+  const mode = qs("mode");
+
+  if(mode === "card"){
+    const card = await t.card("id","name");
+    document.getElementById("title").innerText = card.name;
+    JsBarcode("#barcode","CARD_" + card.id,{format:"CODE128",width:2,height:80});
+  }
+
+  if(mode === "list"){
+    const list = await t.list("id","name");
+    document.getElementById("title").innerText = list.name;
+    JsBarcode("#barcode","LIST_" + list.id,{format:"CODE128",width:2,height:80});
+  }
+
+}
+
+init();
+</script>
+
+</body>
+</html>

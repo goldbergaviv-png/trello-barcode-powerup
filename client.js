@@ -9,7 +9,7 @@ window.TrelloPowerUp.initialize({
       callback: function (t) {
         return t.popup({
           title: 'Print Card Barcode',
-          url: './index.html?mode=card',
+          url: './popup.html?mode=card',
           height: 260
         });
       }
@@ -22,7 +22,7 @@ window.TrelloPowerUp.initialize({
       callback: function (t) {
         return t.popup({
           title: 'Print List Barcode',
-          url: './index.html?mode=list',
+          url: './popup.html?mode=list',
           height: 260
         });
       }
