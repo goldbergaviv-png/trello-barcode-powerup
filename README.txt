@@ -1,4 +1,4 @@
-Upload all files in this ZIP to your GitHub repo root and overwrite existing ones:
+Overwrite these files in your GitHub repo root:
 
 - index.html
 - client.js
@@ -8,10 +8,7 @@ Upload all files in this ZIP to your GitHub repo root and overwrite existing one
 - scanner-config.js
 - logo.jpeg
 - icon.png
-- README.txt
 
+This version makes the QR a bit smaller and moves it up slightly so it is not cut off at the bottom.
 Phone scanner link:
 https://YOUR_USERNAME.github.io/trello-barcode-powerup/scanner.html
-
-This version fixes QR rendering in the print popup.
-Before uploading, put your Trello key/token into scanner-config.js.

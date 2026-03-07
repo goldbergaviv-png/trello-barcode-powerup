@@ -15,7 +15,6 @@
     errorText: document.getElementById('errorText')
   };
   const state = {scanner:null,currentStep:'idle',cardId:'',listId:'',lastText:'',lastAt:0};
-
   function show(screen){
     els.home.classList.add('hidden'); els.scan.classList.add('hidden'); els.done.classList.add('hidden'); els.error.classList.add('hidden');
     screen.classList.remove('hidden');
@@ -90,7 +89,6 @@
       await startScanner();
     }catch(err){ setError(err.message||String(err)); }
   }
-
   els.moveBtn.addEventListener('click', beginFlow);
   els.backBtn.addEventListener('click', resetFlow);
   els.homeStatus.textContent = 'Ready';
