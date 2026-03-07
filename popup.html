@@ -24,7 +24,7 @@ body{ margin:0; padding:8px; font-family:Arial, Helvetica, sans-serif; backgroun
 .comment{ font-size:8pt; width:100%; line-height:1.15; min-height:3.6mm; max-height:3.6mm; overflow:hidden; white-space:normal; word-break:break-word; }
 .qr-wrap{ margin-top:auto; text-align:center; width:100%; }
 .qr-box{ width:34mm; height:34mm; margin:0 auto; display:flex; align-items:center; justify-content:center; }
-.qr-box canvas{ width:34mm !important; height:34mm !important; }
+.qr-box canvas{ width:34mm !important; height:34mm !important; display:block; }
 .code{ font-weight:bold; font-size:9pt; margin-top:1mm; word-break:break-all; }
 .listTitle{ font-size:16pt; font-weight:bold; margin-top:8mm; text-align:center; width:100%; line-height:1.15; word-break:break-word; }
 .error{ padding:20px; font-size:14px; color:#b42318; background:#fff; border:1px solid #f0c5c5; border-radius:8px; }
@@ -43,19 +43,23 @@ function qs(n){ return new URLSearchParams(window.location.search).get(n); }
 function formatDue(d){ if(!d) return ""; const x = new Date(d); if (isNaN(x.getTime())) return ""; return String(x.getDate()).padStart(2,"0")+" "+x.toLocaleString('en',{month:'short'}); }
 function firstLines(desc){ const raw=(desc||'').replace(/\r/g,''); const lines=raw.split('\n').map(x=>x.trim()).filter(x=>x.length>0); return [lines[0]||"", lines[1]||""]; }
 function createLabel(){ const d=document.createElement("div"); d.className="label"; return d; }
-function addLogo(label){ const logo=document.createElement("img"); logo.src="./logo.jpeg?v=11"; logo.className="logo"; label.appendChild(logo); }
+function addLogo(label){ const logo=document.createElement("img"); logo.src="./logo.jpeg?v=12"; logo.className="logo"; label.appendChild(logo); }
 function appendQr(label, text){
   const wrap=document.createElement("div");
   wrap.className="qr-wrap";
   const box=document.createElement("div");
   box.className="qr-box";
+  const canvas=document.createElement("canvas");
+  box.appendChild(canvas);
   wrap.appendChild(box);
   const txt=document.createElement("div");
   txt.className="code";
   txt.innerText=text;
   wrap.appendChild(txt);
   label.appendChild(wrap);
-  QRCode.toCanvas(box, text, {width: 320, margin: 1}, function(err){ if(err){ console.error(err); } });
+  QRCode.toCanvas(canvas, text, {width: 320, margin: 1, errorCorrectionLevel: 'M'}, function(err){
+    if(err){ console.error(err); txt.innerText = "QR ERROR"; }
+  });
 }
 function addError(text){ const err=document.createElement("div"); err.className="error"; err.innerText=text; document.getElementById("container").appendChild(err); }
 async function init(){
