@@ -7,6 +7,7 @@
     error: document.getElementById('errorScreen'),
     homeStatus: document.getElementById('homeStatus'),
     moveBtn: document.getElementById('moveBtn'),
+    doneMoveBtn: document.getElementById('doneMoveBtn'),
     backBtn: document.getElementById('backBtn'),
     stateText: document.getElementById('stateText'),
     hintText: document.getElementById('hintText'),
@@ -30,7 +31,7 @@
     show(els.error);
   }
   function resetFlow(){
-    state.currentStep='idle'; state.cardId=''; state.listId='';
+    state.currentStep='idle'; state.cardId=''; state.listId=''; state.lastText=''; state.lastAt=0;
     els.scanValue.textContent='';
     show(els.home);
   }
@@ -39,7 +40,6 @@
     els.doneText.textContent = msg;
     show(els.done);
     if(navigator.vibrate){ navigator.vibrate(120); }
-    setTimeout(resetFlow, 2000);
   }
   async function moveCard(){
     await stopScanner();
@@ -81,7 +81,7 @@
   }
   async function beginFlow(){
     try{
-      state.currentStep='scanCard'; state.cardId=''; state.listId='';
+      state.currentStep='scanCard'; state.cardId=''; state.listId=''; state.lastText=''; state.lastAt=0;
       els.scanValue.textContent='';
       els.stateText.textContent='Scan Card';
       els.hintText.textContent='Point the camera at a card QR';
@@ -90,6 +90,7 @@
     }catch(err){ setError(err.message||String(err)); }
   }
   els.moveBtn.addEventListener('click', beginFlow);
+  if (els.doneMoveBtn) els.doneMoveBtn.addEventListener('click', beginFlow);
   els.backBtn.addEventListener('click', resetFlow);
   els.homeStatus.textContent = 'Ready';
 })();
