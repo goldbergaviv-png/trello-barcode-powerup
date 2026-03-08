@@ -16,15 +16,15 @@ body{ margin:0; padding:8px; font-family:Arial, Helvetica, sans-serif; backgroun
 #container{ display:flex; flex-direction:column; align-items:center; gap:10px; }
 .label{ width:60mm; height:90mm; padding:3mm 3mm 3.5mm 3mm; display:flex; flex-direction:column; align-items:center; background:white; color:black; overflow:hidden; border:1px solid #ddd; page-break-after:always; break-after:page; }
 .logo{ width:54mm; max-width:54mm; height:12mm; object-fit:contain; display:block; margin-bottom:2mm; }
-.row{ width:100%; display:flex; justify-content:space-between; align-items:flex-start; gap:2mm; font-weight:bold; font-size:10pt; margin-bottom:2mm; }
-.name{ flex:1 1 auto; min-width:0; line-height:1.1; max-height:8mm; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; word-break:break-word; }
-.due{ flex:0 0 auto; white-space:nowrap; text-align:right; }
+.row{ width:100%; display:flex; justify-content:space-between; align-items:flex-start; gap:2mm; font-weight:bold; font-size:10pt; margin-bottom:2mm; flex-wrap:nowrap; }
+.name{ flex:1 1 auto; min-width:0; max-width:36mm; line-height:1.1; max-height:8mm; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; word-break:break-word; padding-right:1mm; }
+.due{ flex:0 0 13mm; width:13mm; min-width:13mm; white-space:nowrap; text-align:right; }
 .cover{ width:54mm; height:28mm; object-fit:contain; display:block; margin-bottom:1.5mm; border:1px solid #ddd; }
 .commentsTitle{ font-size:9pt; font-weight:bold; width:100%; margin-bottom:0.5mm; }
 .comment{ font-size:8pt; width:100%; line-height:1.15; min-height:3.4mm; max-height:3.4mm; overflow:hidden; white-space:normal; word-break:break-word; }
-.qr-wrap{ margin-top:auto; text-align:center; width:100%; padding-bottom:1mm; }
-.qr-box{ width:30mm; height:30mm; margin:0 auto; display:flex; align-items:center; justify-content:center; }
-.qr-box canvas{ width:30mm !important; height:30mm !important; display:block; }
+.qr-wrap{ margin-top:auto; text-align:center; width:100%; padding-bottom:0.5mm; }
+.qr-box{ width:27mm; height:27mm; margin:0 auto; display:flex; align-items:center; justify-content:center; }
+.qr-box canvas{ width:27mm !important; height:27mm !important; display:block; }
 .code{ font-weight:bold; font-size:8pt; margin-top:0.8mm; word-break:break-all; line-height:1.05; max-height:6mm; overflow:hidden; }
 .listTitle{ font-size:16pt; font-weight:bold; margin-top:8mm; text-align:center; width:100%; line-height:1.15; word-break:break-word; }
 .error{ padding:20px; font-size:14px; color:#b42318; background:#fff; border:1px solid #f0c5c5; border-radius:8px; }
@@ -57,7 +57,7 @@ function appendQr(label, text){
   txt.innerText=text;
   wrap.appendChild(txt);
   label.appendChild(wrap);
-  QRCode.toCanvas(canvas, text, {width: 280, margin: 1, errorCorrectionLevel: 'M'}, function(err){
+  QRCode.toCanvas(canvas, text, {width: 240, margin: 1, errorCorrectionLevel: 'M'}, function(err){
     if(err){ console.error(err); txt.innerText = "QR ERROR"; }
   });
 }
