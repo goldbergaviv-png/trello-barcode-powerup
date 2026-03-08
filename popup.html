@@ -65,9 +65,19 @@ function addError(text){ const err=document.createElement("div"); err.className=
 async function init(){
   const mode = qs("mode"); const container=document.getElementById("container");
   if(mode==="card"){
-    const card=await t.card("id","name","due","desc","cover","attachments");
+    const [card, board] = await Promise.all([
+    t.card("id","name","due","desc","cover","attachments"),
+    t.board("name")
+  ]);
     const qr="CARD:"+card.id;
     const label=createLabel(); addLogo(label);
+    const boardName=document.createElement("div");
+    boardName.style.fontSize="10pt";
+    boardName.style.fontWeight="bold";
+    boardName.style.textAlign="center";
+    boardName.style.marginBottom="2mm";
+    boardName.innerText = board.name || "";
+    label.appendChild(boardName);
     const row=document.createElement("div"); row.className="row";
     const name=document.createElement("div"); name.className="name"; name.innerText=card.name||"";
     const due=document.createElement("div"); due.className="due"; due.innerText=formatDue(card.due);
