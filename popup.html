@@ -66,9 +66,9 @@ async function init(){
   const mode = qs("mode"); const container=document.getElementById("container");
   if(mode==="card"){
     const [card, board] = await Promise.all([
-    t.card("id","name","due","desc","cover","attachments"),
-    t.board("name")
-  ]);
+      t.card("id","name","due","desc","cover","attachments"),
+      t.board("name")
+    ]);
     const qr="CARD:"+card.id;
     const label=createLabel(); addLogo(label);
     const boardName=document.createElement("div");
